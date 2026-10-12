@@ -48,6 +48,21 @@ export PATH="$SHIM_DIR:$FLUTTER_DIR/bin:$PATH"
 # Drop any version cached from a run where git lookups failed.
 rm -f "$FLUTTER_DIR/bin/cache/flutter.version.json"
 
+# `.env` is gitignored, so on Netlify it is generated from the project's
+# environment variables (Project configuration > Environment variables).
+# A local `.env` is left untouched.
+if [ ! -f .env ]; then
+  : > .env
+  for key in AUTH_BASE_URL API_BASE_URL RECHARGE_ENDPOINT USER_ID API_TIMEOUT; do
+    if [ -n "${!key:-}" ]; then
+      printf '%s=%s\n' "$key" "${!key}" >> .env
+    fi
+  done
+  if [ -z "${AUTH_BASE_URL:-}" ]; then
+    echo "WARNING: AUTH_BASE_URL is not set; the app will show 'Missing environment values: AUTH_BASE_URL'." >&2
+  fi
+fi
+
 flutter config --no-analytics
 flutter --version
 flutter pub get
