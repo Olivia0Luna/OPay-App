@@ -1,0 +1,11 @@
+# This is a Flutter project (no package.json); the script installs the Flutter
+# SDK and builds the web target.
+[build]
+  command = "bash scripts/netlify-build.sh"
+  publish = "build/web"
+
+# Serve the Flutter app for any client-side route.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
